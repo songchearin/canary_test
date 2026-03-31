@@ -11,14 +11,13 @@ function update_nginx_weight() {
     # 둘 중에 하나는 0퍼센트가 되는 순간이 있는데 0보다 큰 경우에만 이 값을 넣겠다고 제어해줌.
     CONF="upstream backend { "
     [ "$BLUE" -gt 0 ] && CONF="${CONF} server app-blue:8080 weight=${BLUE}; "
-    [ "$GREEN" -gt 0 ] & CONF="${CONF} server app-green:8081 weight=${GREEN}; "
+    [ "$GREEN" -gt 0 ] && CONF="${CONF} server app-green:8081 weight=${GREEN}; "
     CONF="${CONF} }"
 
     # 호스트 밖에서 Nginx 컨테이너 내부로 설정 파일을 덮어쓰고, 프록시를 무중단 리로드(Reload) 처리합니다.
     # excute 시킴, 해당 경로에 덮어쓰고 다시 reload 시킴
     docker exec nginx-proxy sh -c "echo '$CONF' > /etc/nginx/conf.d/upstream.inc"
     docker exec nginx-proxy nginx -s reload
-
 }
 
 # 1. 지금 켜져있는 서버가 누군지 검사합니다.
