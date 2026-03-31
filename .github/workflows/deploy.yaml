@@ -1,0 +1,21 @@
+name: CI/CD Canary Deployment
+
+# 언제 trigger 할 건지
+on:
+  push:
+    branches: ["main"]
+    # 트리거 동작 조건 : main 핵심 브랜치에 코드가 Push(병합)되는 이벤트 감지될 때마다 파이프라인 프로세스가 자동으로 기동되도록 선언
+    # push가 발생했을 때 main 브랜치에 job을 실행
+
+jobs:
+  canary-deploy:
+    #GitHub 클라우드 서버 인프라가 아닌, 앞서 구축한 "내 PC의 로컬 러너" 환경에서 직접 실행되도록 지정함.
+    runs-on: self-hosted # 우리 서버에서 진행할 거다 (SaaS가 아니라)
+
+    steps: # job이 진행되는 세부적인 단계
+      - name: 소스코드 형상 최신화 Checkout # checkout 이라는 이미 만들어져있음
+        uses: actions/checkout@v3
+
+      - name: 카나리 무중단 배포 쉘 스크립트 실행 명령 하달
+        # GitGub 원격 저장소에 반영된 가장 최신의 소스코드를 러너 로컬 영역으로 쳌아웃 복제 후, 시스템 단에서 직접 스크립트를 호출
+        run: bash ./deploy.sh
